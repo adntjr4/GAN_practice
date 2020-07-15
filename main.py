@@ -1,11 +1,11 @@
-import math
-
 import torch
 import torch.nn as nn
 import torch.optim as optim
 import torchvision
 from torchvision import transforms
+import torch.nn.functional as F
 
+from util.summary_logging import *
 from util.progress_msg import *
 from model import Generator, Discriminator
 
@@ -14,7 +14,7 @@ mnist_root = './data'
 batch_size = 128
 vec_len = 16
 feature_num =  16
-total_epoch = 100
+total_epoch = 1024
 learning_rate = 0.0002
 beta1 = 0.5
 
@@ -39,7 +39,7 @@ net_G.apply(weights_init)
 net_D.apply(weights_init)
 
 criterion = nn.BCELoss()
-fixed_noise = torch.randn(64, vec_len, 1, 1, device=device)
+fixed_vector = torch.randn(1, vec_len, 1, 1, device=device)
 _real = 1.
 _fake = 0.
 
@@ -48,9 +48,13 @@ optimizer_D = optim.Adam(net_D.parameters(), lr=learning_rate, betas=(beta1, 0.9
 
 print("Starting Training Loop...")
 
-progmsg = ProgressMsg((total_epoch, math.ceil(60000/batch_size)))
+progmsg = ProgressMsg((total_epoch, len(train_loader)))
+lw = LossWriter()
 
 for epoch in range(total_epoch):
+    D_error_sum = 0.0
+    G_error_sum = 0.0
+
     for i, data in enumerate(train_loader):
         # update D network (train real & fake batch)
         net_D.zero_grad()
@@ -82,5 +86,25 @@ for epoch in range(total_epoch):
 
         # output training stats
         progmsg.print_prog_msg((epoch, i))
-        #if i % 50 == 0:
+        D_error_sum += (real_D_error.item() + fake_D_error.item())
+        G_error_sum += fake_G_error.item()
+
+    # after every epoch save and log print
+    if epoch % 10 == 9:
+        fixed_img = net_G(fixed_vector)
+        tr = transforms.ToPILImage()
+        fixed_img = tr(fixed_img.cpu().squeeze().detach())
+        fixed_img.save('./data/tmp/%d.png'%(epoch+1))
+
+    progmsg.line_reset()
+    print('epoch [%d/%d] - D-error: %.2f, G-error: %.2f'%(epoch+1, total_epoch, D_error_sum/len(train_loader), G_error_sum/len(train_loader)))
             
+    lw.write_loss('loss_d', D_error_sum/len(train_loader), epoch+1)
+    lw.write_loss('loss_g', G_error_sum/len(train_loader), epoch+1)
+
+    torch.save({'epoch': epoch+1,
+                'model_D': net_D,
+                'model_G': net_G,
+                'optimizer_D': optimizer_D,
+                'optimizer_G': optimizer_G},
+                './model/checkpoint/net_checkpoint.pth')

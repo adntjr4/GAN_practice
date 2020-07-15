@@ -10,8 +10,8 @@ class LossWriter(SummaryWriter):
             log_dir = './logs/tensorboard/' + time.strftime('%Y-%m-%d--%H-%M-%S', time.localtime(time.time()))
         super(LossWriter, self).__init__(log_dir=log_dir, comment=comment)
 
-    def write_loss(self, loss, n_iter):
-        self.add_scalar('Loss/loss', loss, n_iter)
+    def write_loss(self, loss_name, scalar, n_iter):
+        self.add_scalar('Loss/'+loss_name, scalar, n_iter)
 
 
 if __name__=='__main__':

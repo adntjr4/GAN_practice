@@ -1,5 +1,6 @@
 import time
 import datetime
+import sys
 
 class ProgressMsg():
     def __init__(self, max):
@@ -36,23 +37,27 @@ class ProgressMsg():
             elapsed_str = str(datetime.timedelta(seconds=int(elapsed)))
             remain_str = str(datetime.timedelta(seconds=int(remain)))
             total_str = str(datetime.timedelta(seconds=int(total)))
-            txt = '>>> progress : %.2f%%, elapsed: %s, remaining: %s, total: %s \t\t\t\t\t' % (pg_per, elapsed_str, remain_str, total_str)
+            txt = '>>> progress : %.2f%%, elapsed: %s, remaining: %s, total: %s' % (pg_per, elapsed_str, remain_str, total_str)
         else:
             elapsed = time.time() - self.start_time
             elapsed_str = str(datetime.timedelta(seconds=int(elapsed)))
-            txt = '>>> progress : %.2f%%, elapsed: %s, remaining: %s, total: %s \t\t\t\t\t' % (pg_per, elapsed_str, 'INF', 'INF')
+            txt = '>>> progress : %.2f%%, elapsed: %s, remaining: %s, total: %s' % (pg_per, elapsed_str, 'INF', 'INF')
 
-        
         print(txt, end='\r')
 
-        return txt.replace('\t', '')
+        return txt
+
+    def line_reset(self):
+        sys.stdout.write("\033[K")
 
     def print_finish_msg(self):
         total = time.time() - self.start_time
         total_str = str(datetime.timedelta(seconds=int(total)))
-        txt = 'Finish >>> (total elapsed time : %s) \t\t\t\t\t' % total_str
+        txt = 'Finish >>> (total elapsed time : %s)' % total_str
         print(txt)
-        return txt.replace('\t', '')
+        return txt
+
+
 
 if __name__ == '__main__':
     pp = ProgressMsg((100,10))

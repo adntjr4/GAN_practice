@@ -1,20 +1,23 @@
 # ignore pycache files
 __pycache__/*
+*/__pycache__/*
 
-# ignore virtualenv file
+# ignore virtualenv folder & command files
 venv/*
 venv.cmd
 venv.sh
 show_tensorboard.cmd
+show_tensorboard.sh
 
-# ignore data files
+# ignore data folder
 data/*
 
-# ignore trained model file
+# ignore trained model folder
 model/*
 
-# ignore log file
+# ignore log folder
 logs/*
 
-# ignore temp file
+# ignore temp folder
 tmp/*
+
