@@ -1,6 +1,7 @@
 # ignore pycache files
 __pycache__/*
 */__pycache__/*
+*/*/__pycache__/*
 
 # ignore virtualenv folder & command files
 venv/*
