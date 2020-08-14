@@ -3,6 +3,9 @@ __pycache__/*
 */__pycache__/*
 */*/__pycache__/*
 
+# ignore vscode folder
+.vscode/*
+
 # ignore virtualenv folder & command files
 venv/*
 venv.cmd
@@ -12,9 +15,12 @@ show_tensorboard.sh
 
 # ignore data folder
 data/*
+!data/.gitkeep
 
 # ignore trained model folder
 model/*
+!model/.gitkeep
+!model/checkpoint/.gitkeep
 
 # ignore log folder
 logs/*
